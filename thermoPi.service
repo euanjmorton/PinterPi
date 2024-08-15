@@ -1,0 +1,13 @@
+[Unit] 
+Description=ThermoNode 
+After=network.target 
+
+[Service] 
+Environment=NODE_PORT=3001 
+Type=simple 
+User=pi 
+ExecStart=/usr/bin/nodejs /home/pi/thermo/thermoServer.js 
+Restart=on-failure 
+
+[Install] 
+WantedBy=multi-user.target

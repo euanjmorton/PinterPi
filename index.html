@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<script src="jquery-3.4.1.js"></script>
+<script src="main.js"></script>
+<body>
+	<div>
+		<h3>Hello world!</h3>
+		<button onclick="getFridgeStatus()">getHeatingStatus</button>
+		<button onclick="toggleFridge()">Toggle Fridge</button>
+		<p id="pinMessage"></p>
+	</div>
+	<div>
+		<h3>Heating ststus:</h3>
+		<p id="heatingMessage"></p>
+		<p id="heatingTime"></p>
+	</div>
+	<div>
+		<span><h3>Temperature set: </h3><h3 id="titleTemp"></h3>
+		<input type="text" id="setTemp" name="setTemp">
+  		<button onclick="setTemperature()">Set Temperature</button>
+		<p id="setTempMessage"></p>
+	</div>
+</body>
+</body>
+</html>
