@@ -203,6 +203,7 @@ var getFridgeStatus = function(){
 	return { 
 			message: message,
 			isAppRunning: runningFridgeApp,
+			fridgeStatus: fridgeStatus,
 			time: timeOfOn,
 			temperature: digitToDisplay,
 			LastUpdated: 0

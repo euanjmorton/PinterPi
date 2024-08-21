@@ -11,7 +11,14 @@ var express    = require('express');        // call express
 var app        = express();                 // define our app using express
 var bodyParser = require('body-parser');
 
-//cors shit
+
+require('dotenv').config(); //.env file for config strings
+const mysql = require('mysql2');
+var moment = require('moment');
+
+
+
+//cors stuff
 app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
@@ -61,6 +68,58 @@ router.get('/setTemperature', function(req, res) {
 router.get('/runFridgeApp', function(req, res) {
   res.json(myModule.runFridgeApp());
 });
+
+//chekc if fridge on:
+//get temp
+//send to db
+
+
+console.log("do the thing:!");
+//TODO: change timer to more robust check
+setTimeout(function () {
+  var heatingStatus = myModule.getFridgeStatus();
+
+  console.log("do the thing:!", heatingStatus);
+  
+  if(heatingStatus.fridgeStatus){
+      sendTempToDB(heatingStatus.temperature);
+  }
+
+}, 10000);
+
+
+function sendTempToDB(temp){
+  var con = mysql.createConnection({
+    host: process.env.host,
+    user: process.env.user,
+    password: process.env.password
+  });
+
+
+  temperatureInterval = setInterval(function () {
+    
+    con.connect(function(err) {
+      if (err) throw err;
+      console.log("Connected!");
+
+
+      //mysql format: YYYY-MM-DD hh:mm:ss
+
+      var dateNtime = moment().format('YYYY-MM-DD hh:mm:ss');
+      
+      console.log("date2!", dateNtime);
+      
+      var query = 'INSERT INTO Pinter_Pi.Temperature (date, temperature, type)' +
+                  'VALUES (convert("'+dateNtime+'",datetime), "' + temp +'", "test")';
+      
+      con.query(query, function (err, result) {
+          if (err) throw err;
+          console.log("result",result);
+      });
+    });  
+
+  }, 30000);	
+}
 
 
 
