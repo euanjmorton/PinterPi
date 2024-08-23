@@ -32,18 +32,15 @@ var tempToSet = 15;
 var runningFridgeApp = false;
 
 var digitToDisplay = 0;
-var segdigitinterval = setInterval(getThermo, 5000);
+var currentTemperature = 0;
+
+//var segdigitinterval = setInterval(getThermo, 5000);
 var listOfSensorIds = '';
 thermoSensor.list(function (err, listOfDeviceIds2) {
 	//console.log(listOfDeviceIds);
 	listOfSensorIds = listOfDeviceIds2[0];
 });
-function getThermo() {
-	thermoSensor.get(listOfSensorIds, function (err, temp) {
-		//console.log("temp", temp);
-		digitToDisplay = parseInt(temp);
-	});
-}
+
 
 //Outputs
 var fridgePowerPin = new Gpio(12, 'out');
@@ -113,16 +110,16 @@ async function start() {
 	//while(runningFridgeApp){
 	temperatureInterval = setInterval(function () 
 		{
-			var temp = thermoSensor.get(listOfDeviceIds[0]);
+			currentTemperature = thermoSensor.get(listOfDeviceIds[0]);
 
-			temp = parseInt(temp);
+			digitToDisplay = parseInt(currentTemperature);
 
-			if(temp > tempToSet){
+			if(digitToDisplay > tempToSet){
 				//pin/fridge on
 				fridgePowerPin.write(0);//on
 				heaterPowerPin.write(1);//off
 			}
-			else if(temp < tempToSet){
+			else if(digitToDisplay < tempToSet){
 				fridgePowerPin.write(1);//off
 				heaterPowerPin.write(0);//on
 			}
@@ -131,47 +128,26 @@ async function start() {
 				heaterPowerPin.write(1);//off
 			}
 
-
-
 			//await new Promise(resolve => setTimeout(resolve, 10000));
-			console.log("CHECK TEMP", temp, tempToSet);
+			console.log("CHECK TEMP", currentTemperature, tempToSet);
 		}, 10000);	
 		
 }
 
 
-
-var count8 = 0;
-
-
-var myHeatTimer = null;
-
 var getTemperature = function() {	
 	var listOfDeviceIds = thermoSensor.list();
-	var temp = thermoSensor.get(listOfDeviceIds[0]);
+	var currentTemperature = thermoSensor.get(listOfDeviceIds[0]);
 
-	return temp;  
+	return currentTemperature;  
 }
 
-var setTemperature = function(res, req) {	
-	console.log("res", res);
-	console.log("req", req);
-	return temp;  
+var setTemperature = function(temp) {	
+	
+	console.log("setting new temp", temp);
+	tempToSet = temp;
+	return currentTemperature;  
 }
-
-var getTemperatureMessage = function() {	
-	var listOfDeviceIds = thermoSensor.list();
-	//console.log(listOfDeviceIds);
-
-	var temp = thermoSensor.get(listOfDeviceIds[0]);
-	//digitToDisplay = parseInt(temp);
-
-	return { message: 'Temperature', temperature: digitToDisplay };  
-}
-var getSetTemp = function() {
-	return { message: 'Temp set to:' + tempToSet };  
-}
-
 
 var getFridgeStatus = function(){
 	var fridgeStatus = false;
@@ -205,7 +181,7 @@ var getFridgeStatus = function(){
 			isAppRunning: runningFridgeApp,
 			fridgeStatus: fridgeStatus,
 			time: timeOfOn,
-			temperature: digitToDisplay,
+			temperature: currentTemperature,
 			LastUpdated: 0
 		};  
 }
@@ -222,6 +198,7 @@ module.exports = {
 	runFridgeApp,
 	//tempTest,
 	getTemperature,
+	setTemperature,
 	getFridgeStatus
 }
 	

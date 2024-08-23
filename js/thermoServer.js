@@ -97,6 +97,10 @@ function sendTempToDB(temp){
 
 
   temperatureInterval = setInterval(function () {
+
+    var heatingStatus = myModule.getFridgeStatus();
+
+    myModule.setTemperature()
     
     con.connect(function(err) {
       if (err) throw err;
@@ -110,15 +114,22 @@ function sendTempToDB(temp){
       console.log("date2!", dateNtime);
       
       var query = 'INSERT INTO Pinter_Pi.Temperature (date, temperature, type)' +
-                  'VALUES (convert("'+dateNtime+'",datetime), "' + temp +'", "test")';
+                  'VALUES (convert("'+dateNtime+'",datetime), "' + heatingStatus.temperature +'", "test")';
       
       con.query(query, function (err, result) {
           if (err) throw err;
           console.log("result",result);
       });
+
+      con.query("SELECT * FROM Pinter_Pi.Pi_Settings ORDER BY ID DESC LIMIT 1;", function (err, result) {
+        if (err) throw err;
+        console.log("result",result);
+        myModule.setTemperature(result[0].temperature);
+
+      });
     });  
 
-  }, 30000);	
+  }, 1800000);	//1800000 30 mins
 }
 
 
